@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        body {
+            background-image: url('https://i.blogs.es/67fb66/sample-jpg-1200/1366_2000.jpg'); /* Cambia esta URL por la de tu imagen */
+            background-size: cover;
+            background-attachment: fixed;
+            color: #000; /* Letras negras */
+            font-family: 'Arial', sans-serif;
+        }
+        .card {
+            border-radius: 15px;
+            border: 3px solid #000; /* Bordes negros */
+            background-color: rgba(255, 255, 255, 0.8); /* Cuadro transparente */
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        h4 {
+            font-family: 'Georgia', serif;
+            color: #000000; /* Título en blanco */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+        }
+        button {
+            transition: background-color 0.3s, transform 0.3s;
+            border-radius: 20px;
+        }
+        #calculate-btn {
+            background-color: #2c2c2c; /* Color azul */
+            color: white;
+        }
+        #reset-btn {
+            background-color: #2c2c2c; /* Color rojo */
+            color: white;
+        }
+        #edit-btn {
+            background-color: #2c2c2c; /* Color verde */
+            color: white;
+        }
+        button:hover {
+            opacity: 0.9; /* Ligera opacidad al pasar el ratón */
+            transform: translateY(-2px);
+        }
+        #resultado {
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+        }
+    </style>
+    <title>Precio del departamento</title>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="card mt-5 shadow">
+                <div class="card-body">
+                    <h4 class="text-center">Red Neuronal de Alquiler de Departamentos</h4>
+                </div>
+            </div>
+            <div class="card mt-2 shadow">
+                <div class="card-body">
+                    <label for="m2">Metros cuadrados (m2)</label>
+                    <input type="number" class="form-control mb-3" id="m2" min="1">
+                    
+                    <label for="hab">N° de habitaciones</label>
+                    <input type="number" class="form-control mb-3" id="hab" min="1">
+                    
+                    <label for="planta">N° de planta</label>
+                    <input type="number" class="form-control mb-3" id="planta" min="0">
+                    
+                    <label for="ascensor">Ascensor</label>
+                    <select id="ascensor" class="form-control mb-3">
+                        <option disabled selected>Elige una opción</option>
+                        <option value="0">NO</option>
+                        <option value="1">SI</option>
+                    </select>
+                    
+                    <label for="ext">Exterior</label>
+                    <select id="ext" class="form-control mb-3">
+                        <option disabled selected>Elige una opción</option>
+                        <option value="0">NO</option>
+                        <option value="1">SI</option>
+                    </select>
+                    
+                    <label for="est">Estado</label>
+                    <select id="est" class="form-control mb-3">
+                        <option disabled selected>Elige una opción</option>
+                        <option value="0">No rehabilitado</option>
+                        <option value="1">Si rehabilitado</option>
+                        <option value="2">Nuevo</option>
+                    </select>
+                    
+                    <label for="cent">Céntrico</label>
+                    <select id="cent" class="form-control mb-3">
+                        <option disabled selected>Elige una opción</option>
+                        <option value="0">NO</option>
+                        <option value="1">SI</option>
+                    </select>
+
+                    <div class="d-flex justify-content-between">
+                        <button class="btn" type="button" id="calculate-btn">Calcular Precio</button>
+                        <button class="btn" type="button" id="reset-btn">Borrar</button>
+                        <button class="btn" type="button" id="edit-btn">Editar</button>
+                        <h5 id="resultado" class="mx-5 mt-2"></h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.21.0/dist/tf.min.js"></script>
+    <script>
+        var modelo = null;
+        (async () => {
+            console.log("Cargando el modelo....");
+            modelo = await tf.loadLayersModel("model.json");
+            console.log("Modelo Cargado...");
+        })();
+
+        // Función para manejar el botón de calcular precio
+        document.getElementById('calculate-btn').onclick = function() {
+            const m2 = parseFloat(document.getElementById('m2').value) || 0;
+            const hab = parseInt(document.getElementById('hab').value) || 0;
+            const planta = parseInt(document.getElementById('planta').value) || 0;
+            const ascensor = parseInt(document.getElementById('ascensor').value) || 0;
+            const ext = parseInt(document.getElementById('ext').value) || 0;
+            const est = parseInt(document.getElementById('est').value) || 0;
+            const cent = parseInt(document.getElementById('cent').value) || 0;
+
+            // Simulación de cálculo de precio
+            let precioBase = m2 * 100; // Por ejemplo, 100 por metro cuadrado
+            precioBase += hab * 50; // Añadir 50 por habitación
+            precioBase += planta * 20; // Añadir 20 por planta
+            if (ascensor) precioBase += 100; // Añadir 100 si tiene ascensor
+            if (ext) precioBase += 50; // Añadir 50 si es exterior
+            if (est === 1) precioBase += 200; // 200 si está rehabilitado
+            if (est === 2) precioBase += 300; // 300 si es nuevo
+            if (cent) precioBase += 150; // 150 si es céntrico
+
+            document.getElementById('resultado').innerText = `Precio estimado: $${precioBase}`;
+        };
+
+        // Función para manejar el botón de borrar
+        document.getElementById('reset-btn').onclick = function() {
+            document.getElementById('m2').value = '';
+            document.getElementById('hab').value = '';
+            document.getElementById('planta').value = '';
+            document.getElementById('ascensor').selectedIndex = 0;
+            document.getElementById('ext').selectedIndex = 0;
+            document.getElementById('est').selectedIndex = 0;
+            document.getElementById('cent').selectedIndex = 0;
+            document.getElementById('resultado').innerText = '';
+        };
+
+        // Función para manejar el botón de editar
+        document.getElementById('edit-btn').onclick = function() {
+            // Habilitar los campos para editar
+            document.getElementById('m2').removeAttribute('disabled');
+            document.getElementById('hab').removeAttribute('disabled');
+            document.getElementById('planta').removeAttribute('disabled');
+            document.getElementById('ascensor').removeAttribute('disabled');
+            document.getElementById('ext').removeAttribute('disabled');
+            document.getElementById('est').removeAttribute('disabled');
+            document.getElementById('cent').removeAttribute('disabled');
+
+            alert('Ahora puedes editar los campos. Después de editar, presiona "Calcular Precio" para obtener el nuevo precio.');
+        };
+
+        // Deshabilitar campos inicialmente
+        document.querySelectorAll('input, select').forEach(el => {
+            el.setAttribute('disabled', 'true');
+        });
+        
+        // Habilitar los campos para ingresar datos
+        document.querySelectorAll('input, select').forEach(el => {
+            el.removeAttribute('disabled');
+        });
+    </script>
+</body>
+</html>
